@@ -18,7 +18,7 @@ backtest → hosted tier
 | 0.1 ✅ | Repo skeleton | `pyproject` (depends on `portfoliopilot`), CI, `benji` CLI stub, `~/Benji` folder layout, config loader | `benji init` creates the folder and a config; CI green |
 | 0.2 ✅ | Data classes | `Public` / `Private` Pydantic bases; `PublicPrompt` / `PrivatePrompt`; render helpers | A `Private` field inside a `Public` model fails validation; prompt type follows content |
 | 0.3 ✅ | Egress policy + `net` | `LocalClient` (Ollama), `HostedClient` (disabled), `EgressViolation`, allow-listed `net` module, `benji egress audit` | Fuzz test: hosted client rejects every `Private` model; local-only run makes zero non-localhost calls |
-| 0.4 | Fake client + run store | Recorded-response client for tests; `runs`/`prompts` tables; every call persisted | A run can be replayed from the store with identical outputs |
+| 0.4 ✅ | Fake client + run store | Recorded-response client for tests; `runs`/`prompts` tables; every call persisted | A run can be replayed from the store with identical outputs |
 
 ## Milestone 1 — Tools (back-office bridge)
 
