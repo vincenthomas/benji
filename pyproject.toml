@@ -40,5 +40,8 @@ ignore = ["S101"]  # asserts in tests
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S603", "S607", "E501"]  # git in fixtures; long assert lines
 
+[tool.ruff.lint.isort]
+known-first-party = ["benji", "portfoliopilot"]  # deterministic sorting on a fresh checkout
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
