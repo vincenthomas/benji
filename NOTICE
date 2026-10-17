@@ -1,0 +1,7 @@
+Benji
+Copyright (c) 2026 Vincent Thomas
+
+Portions of the agent graph, prompts, and state design are rewritten from
+TradingAgents (https://github.com/TauricResearch/TradingAgents),
+Copyright (c) Tauric Research, licensed under the Apache License, Version 2.0.
+Each rewritten piece is identified in its module docstring.

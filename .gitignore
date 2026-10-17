@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+# all user data lives OUTSIDE the repo (see docs/DESIGN.md "Where data lives"); belt and braces:
+data/
+runs/
+*.duckdb
+*.duckdb.wal
+.env
