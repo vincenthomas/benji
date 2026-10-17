@@ -19,6 +19,15 @@ Design complete; implementation starts at Milestone 0 of [docs/BUILD_PLAN.md](do
 Phase 0 runs **local-only** (Ollama). A hosted tier for public-data agents is designed in and
 ships disabled.
 
+## Quick start
+
+```bash
+pip install -e ".[dev]"
+benji init --home ~/wherever/benji-data     # must be outside any git repo; remembered for later commands
+benji config check
+pytest
+```
+
 ## Lineage
 
 The agent graph and several prompts are rewritten from

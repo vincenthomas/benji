@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "benji"
+version = "0.0.1"
+description = "An agentic investment desk that runs on one laptop. Agents propose; you approve."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+dependencies = [
+    "portfoliopilot @ git+https://github.com/vincenthomas/portfoliopilot@main",
+    "pydantic>=2.7",
+    "pyyaml>=6.0",
+    "typer>=0.12",
+    "duckdb>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff", "mypy", "types-PyYAML"]
+
+[project.scripts]
+benji = "benji.cli:app"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/benji"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S", "DTZ", "RUF"]
+ignore = ["S101"]  # asserts in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S603", "S607", "E501"]  # git in fixtures; long assert lines
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

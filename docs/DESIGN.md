@@ -71,7 +71,8 @@ One module, `benji/egress/policy.py`, sits between every agent and every model c
 ### 3.3 Where data lives
 
 ```
-~/Benji/                      owner-chosen folder, outside any repo, never synced by Benji
+<Benji home>/                 owner-chosen folder (`benji init --home PATH`; default ~/Benji),
+                              OUTSIDE any git working tree — init refuses otherwise — never synced by Benji
   config.yaml                 limits, universe, model tiers, budgets (no secrets)
   household.json              lots, accounts, tax profile  (PortfolioPilot format)
   benji.duckdb                prices, universe, filings, news archive, runs, memos, scoreboard
