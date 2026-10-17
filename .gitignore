@@ -8,8 +8,8 @@ build/
 .ruff_cache/
 .mypy_cache/
 # all user data lives OUTSIDE the repo (see docs/DESIGN.md "Where data lives"); belt and braces:
-data/
-runs/
+/data/
+/runs/
 *.duckdb
 *.duckdb.wal
 .env
