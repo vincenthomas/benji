@@ -55,6 +55,10 @@ class Home:
         return self.path / self.config.db_file
 
     @property
+    def prices_db(self) -> Path:
+        return self.path / Path(self.config.prices_db).expanduser()
+
+    @property
     def config(self) -> BenjiConfig:
         return BenjiConfig.load(self.config_file) if self.config_file.exists() else BenjiConfig()
 

@@ -97,6 +97,13 @@ class Net:
             self.records.append(NetRecord(datetime.now(UTC), host, purpose, data_class,
                                           len(body or b""), resp_len, status))
 
+    def note(self, host: str, *, purpose: str, data_class: DataClass = "public") -> None:
+        """Record egress performed by a delegated library (e.g. PortfolioPilot's vendor adapter)
+        that does not go through `request`. Same allow-list and data-class rules apply, so the
+        audit trail stays complete and a Private note to a remote host is still a violation."""
+        self.check(f"https://{host}/", data_class)
+        self.records.append(NetRecord(datetime.now(UTC), host.lower(), purpose, data_class, 0, 0, None))
+
     def hosts_contacted(self) -> set[str]:
         return {r.host for r in self.records}
 
