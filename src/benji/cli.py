@@ -77,8 +77,46 @@ def egress_policy(home: Path | None = HOME_OPTION) -> None:
     typer.echo(f"Hosted tier enabled: {cfg.models.hosted_enabled}")
     typer.echo(f"Local endpoint: {cfg.models.local_endpoint}  model: {cfg.models.local_model}")
     typer.echo("Allow-listed hosts: localhost plus configured market-data vendors (run-time list).")
-    typer.echo("Audit a run: benji egress audit <run-id>   (available once runs are stored, item 0.4)")
+    typer.echo("Audit a run: benji egress audit <run-id>")
 
 
 if __name__ == "__main__":
     app()
+
+
+RUN_ID_ARG = typer.Argument(..., help="Run id as listed by `benji runs`")
+
+
+@egress_app.command("audit")
+def egress_audit(run_id: str = RUN_ID_ARG, home: Path | None = HOME_OPTION) -> None:
+    """Every host a stored run contacted, from the persisted net log. Exit 1 if Private data went remote."""
+    from benji.store.runs import RunStore
+
+    h = resolve(home)
+    if not h.db_file.exists():
+        typer.echo(f"no store at {h.db_file}", err=True)
+        raise typer.Exit(2)
+    store = RunStore.open(h.db_file)
+    s = store.egress_summary(run_id)
+    typer.echo(f"run {run_id}: {s['calls']} network calls, hosts: {', '.join(s['hosts']) or '(none)'}")
+    for ts, host, purpose, dc, out, inn, status in store.net_log(run_id):
+        typer.echo(f"  {ts:%H:%M:%S} {host:30} {dc:7} {purpose:20} out={out} in={inn} status={status}")
+    if s["private_to_remote"]:
+        typer.echo(f"VIOLATION: {s['private_to_remote']} private payload(s) sent to a non-local host",
+                   err=True)
+        raise typer.Exit(1)
+    typer.echo("non-local hosts: " + (", ".join(s["non_local"]) or "none")
+               + " — no private data left localhost")
+
+
+@app.command("runs")
+def runs_cmd(home: Path | None = HOME_OPTION, limit: int = 20) -> None:
+    """List stored runs, newest first."""
+    from benji.store.runs import RunStore
+
+    h = resolve(home)
+    if not h.db_file.exists():
+        typer.echo("no runs yet")
+        return
+    for run_id, started, mode, status, _ in RunStore.open(h.db_file).runs(limit):
+        typer.echo(f"{run_id:40} {started:%Y-%m-%d %H:%M} {mode:8} {status}")
