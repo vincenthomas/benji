@@ -120,3 +120,62 @@ def runs_cmd(home: Path | None = HOME_OPTION, limit: int = 20) -> None:
         return
     for run_id, started, mode, status, _ in RunStore.open(h.db_file).runs(limit):
         typer.echo(f"{run_id:40} {started:%Y-%m-%d %H:%M} {mode:8} {status}")
+
+
+market_app = typer.Typer(help="Market tools (Public data) served from the price cache.")
+app.add_typer(market_app, name="market")
+
+TICKER_ARG = typer.Argument(..., help="Ticker symbol")
+AS_OF_OPTION = typer.Option(None, "--as-of", help="YYYY-MM-DD (default today)")
+FILL_OPTION = typer.Option(False, "--fill", help="Fetch missing bars from the vendor via PortfolioPilot")
+
+
+def _market(home: Path | None, fill: bool):
+    from benji.egress.net import Net
+    from benji.tools.market import MarketTools
+    from portfoliopilot.ledger.prices import PriceStore
+
+    h = resolve(home)
+    if not h.prices_db.exists() and not fill:
+        typer.echo(f"no price cache at {h.prices_db}; run with --fill or set prices_db in config", err=True)
+        raise typer.Exit(2)
+    store = PriceStore.open(h.prices_db)
+    net = Net().allow("query1.finance.yahoo.com", "query2.finance.yahoo.com")
+    filler = None
+    if fill:
+        from portfoliopilot.market_data.adapters.yfinance_adapter import YFinanceAdapter
+        from portfoliopilot.market_data.service import MarketDataService
+
+        svc = MarketDataService(YFinanceAdapter(), store)
+        filler = lambda t, lo, hi: svc.sync(t, lo, hi)  # noqa: E731
+    return MarketTools(store, net=net, fill=filler), net
+
+
+@market_app.command("snapshot")
+def market_snapshot(ticker: str = TICKER_ARG, as_of: str | None = AS_OF_OPTION,
+                    fill: bool = FILL_OPTION, home: Path | None = HOME_OPTION) -> None:
+    """Latest close, change, 52-week range and trend context for one ticker."""
+    from datetime import date
+
+    tools, net = _market(home, fill)
+    snap = tools.get_snapshot(ticker, date.fromisoformat(as_of) if as_of else None)
+    if snap is None:
+        typer.echo(f"no bars for {ticker.upper()} in the cache", err=True)
+        raise typer.Exit(1)
+    typer.echo(snap.model_dump_json(indent=2))
+    if net.records:
+        typer.echo(f"egress: {sorted(net.hosts_contacted())}", err=True)
+
+
+@market_app.command("indicators")
+def market_indicators(ticker: str = TICKER_ARG, as_of: str | None = AS_OF_OPTION,
+                      fill: bool = FILL_OPTION, home: Path | None = HOME_OPTION) -> None:
+    """Moving averages, RSI, MACD, ATR, Bollinger bands, trailing returns."""
+    from datetime import date
+
+    tools, _ = _market(home, fill)
+    ind = tools.get_indicators(ticker, date.fromisoformat(as_of) if as_of else None)
+    if ind is None:
+        typer.echo(f"no bars for {ticker.upper()} in the cache", err=True)
+        raise typer.Exit(1)
+    typer.echo(ind.model_dump_json(indent=2))

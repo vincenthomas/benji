@@ -24,7 +24,7 @@ backtest → hosted tier
 
 | # | Item | Scope | Exit gate |
 | --- | --- | --- | --- |
-| 1.1 | Market tools | `get_bars`, `get_indicators` (stockstats or own), `get_snapshot` from PortfolioPilot cache; **Public** | Tools never hit the network when the cache covers the window |
+| 1.1 ✅ | Market tools | `get_bars`, `get_indicators` (stockstats or own), `get_snapshot` from PortfolioPilot cache; **Public** | Tools never hit the network when the cache covers the window |
 | 1.2 | Fundamentals + filings | EDGAR fetcher ported behind cache (`filings`, `fundamentals` tables); `get_fundamentals`, `get_filing_sections`; **Public** | Second call for the same filing is served from DuckDB |
 | 1.3 | News archive | Daily fetch into `news` with fetch date; `get_news`, `get_macro`; **Public** | Archive rows are immutable; a query for a past window returns only rows fetched on or before it |
 | 1.4 | Book tools | `get_exposures`, `check_gates`, `estimate_tax`, `select_lots`, `size_position`; **Private** | Golden cases from PortfolioPilot pass through the tool layer unchanged |

@@ -75,6 +75,9 @@ class BenjiConfig(BaseModel):
     budgets: Budgets = Budgets()
     household_file: str = "household.json"
     db_file: str = "benji.duckdb"
+    # PortfolioPilot price cache (public market data). Relative paths resolve inside the Benji home;
+    # point it at an existing cache to share one history between the two tools.
+    prices_db: str = "prices.duckdb"
 
     @classmethod
     def load(cls, path: Path) -> BenjiConfig:
