@@ -28,7 +28,8 @@ class _Tagged(BaseModel):
 
     def render(self) -> str:
         """Compact, deterministic text for inclusion in a prompt."""
-        return f"{type(self).__name__}: " + json.dumps(self.model_dump(mode="json"), sort_keys=True, default=str)
+        body = json.dumps(self.model_dump(mode="json"), sort_keys=True, default=str)
+        return f"{type(self).__name__}: {body}"
 
 
 class Public(_Tagged):
